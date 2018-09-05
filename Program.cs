@@ -221,6 +221,54 @@ namespace nss
                 Console.WriteLine(output);
             }
 
+            // List the instructors and students assigned to each cohort
+            Dictionary<int, Cohort> allCohorts = new Dictionary<int, Cohort>();
+
+            //start with the main thing, then you want instructor and student... then end with the main
+            db.Query<Cohort, Instructor, Student, Cohort>(@"
+                SELECT
+                       c.Id,
+                       c.Name,
+                       i.Id,
+                       i.FirstName,
+                       i.LastName,
+                       i.CohortId,
+                       s.Id,
+                       s.FirstName,
+                       s.LastName,
+                       s.CohortId
+                FROM Cohort c
+                JOIN Instructor i ON i.CohortId = c.Id
+                JOIN Student s ON s.CohortId = c.Id
+            ", (cohort, instructor, student) =>
+            {
+                Console.WriteLine(cohort.Name);
+                if (!allCohorts.ContainsKey(cohort.Id))
+                {
+                    allCohorts[cohort.Id] = cohort;
+                }
+                allCohorts[cohort.Id].Students.Add(student);
+                allCohorts[cohort.Id].Instructors.Add(instructor);
+                return cohort;
+            });
+
+            /*
+                Display the student information using the StringBuilder class
+             */
+            foreach (KeyValuePair<int, Cohort> cohort in allCohorts)
+            {
+
+                List<string> studentsInCohort = new List<string>();
+                cohort.Value.Students.ForEach(s => studentsInCohort.Add($"{s.FirstName} {s.LastName}"));
+
+                List<string> instructorsInCohort = new List<string>();
+                cohort.Value.Instructors.ForEach(i => instructorsInCohort.Add($"{i.FirstName} {i.LastName}"));
+
+                StringBuilder output = new StringBuilder();
+                output.Append($"{cohort.Value.Name} Students: {String.Join(", ", studentsInCohort)} Instructors: {String.Join(", ", instructorsInCohort)}");
+                Console.WriteLine(output);
+            }
+
 
 
 

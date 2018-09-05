@@ -144,7 +144,6 @@ namespace nss.Data
                               c.Id
                         FROM Cohort c WHERE c.Name = 'Evening Cohort 1'
                     ");
-
                 }
             }
         }
