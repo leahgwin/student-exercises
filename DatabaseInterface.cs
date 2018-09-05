@@ -69,6 +69,88 @@ namespace nss.Data
             }
         }
 
+        public static void CheckExerciseTable()
+        {
+            SqliteConnection db = DatabaseInterface.Connection;
+
+            try
+            {
+                List<Exercise> exercises = db.Query<Exercise>
+                    ("SELECT Id FROM Exercise").ToList();
+            }
+            catch (System.Exception ex)
+            {
+                if (ex.Message.Contains("no such table"))
+                {
+                    db.Execute(@"CREATE TABLE Exercise (
+                        `Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        `Name`	TEXT NOT NULL UNIQUE,
+                        'Language' TEXT NOT NULL
+                    )");
+
+                    db.Execute(@"INSERT INTO Exercise
+                        VALUES (null, 'ChickenMonkey', 'JavaScript')");
+
+                }
+            }
+        }
+
+
+        public static void CheckStudentExerciseTable()
+        {
+            SqliteConnection db = DatabaseInterface.Connection;
+
+            try
+            {
+                List<StudentExercise> studentExercises = db.Query<StudentExercise>
+                    ("SELECT Id FROM StudentExercise").ToList();
+            }
+            catch (System.Exception ex)
+            {
+                if (ex.Message.Contains("no such table"))
+                {
+                    StudentExercise.Create(db);
+                    StudentExercise.Seed(db);
+                }
+            }
+        }
+        public static void CheckStudentsTable()
+        {
+            SqliteConnection db = DatabaseInterface.Connection;
+
+            try
+            {
+                List<Student> students = db.Query<Student>
+                    ("SELECT Id FROM Student").ToList();
+            }
+            catch (System.Exception ex)
+            {
+                if (ex.Message.Contains("no such table"))
+                {
+                    db.Execute($@"CREATE TABLE Student (
+                        `Id`	integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        `FirstName`	TEXT NOT NULL,
+                        `LastName`	TEXT NOT NULL,
+                        `SlackHandle`	TEXT NOT NULL,
+                        `CohortId`	integer NOT NULL,
+                        FOREIGN KEY(`CohortId`) REFERENCES `Cohort`(`Id`)
+                    )");
+
+                    db.Execute($@"INSERT INTO Student
+                        SELECT null,
+                              'Leah',
+                              'Gwin',
+                              '@leahgwin',
+                              c.Id
+                        FROM Cohort c WHERE c.Name = 'Evening Cohort 1'
+                    ");
+
+                }
+            }
+        }
+
+
+
         public static void CheckInstructorsTable()
         {
             SqliteConnection db = DatabaseInterface.Connection;

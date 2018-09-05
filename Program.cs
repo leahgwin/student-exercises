@@ -22,6 +22,11 @@ namespace nss
             SqliteConnection db = DatabaseInterface.Connection;
             DatabaseInterface.CheckCohortTable();
             DatabaseInterface.CheckInstructorsTable();
+            DatabaseInterface.CheckExerciseTable();
+            DatabaseInterface.CheckStudentsTable();
+            DatabaseInterface.CheckStudentExerciseTable();
+
+
 
             List<Instructor> instructors = db.Query<Instructor>(@"SELECT * FROM Instructor").ToList();
             instructors.ForEach(i => Console.WriteLine($"{i.FirstName} {i.LastName}"));
